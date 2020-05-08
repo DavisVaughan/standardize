@@ -11,7 +11,7 @@ static SEXP dots_standardize(SEXP dots, SEXP env, R_len_t size);
 // but otherwise evaluate the dots and return the results
 // as a list (possibly named).
 SEXP export_dots_standardize(SEXP env) {
-  SEXP dots = Rf_findVar(R_DotsSymbol, env);
+  SEXP dots = Rf_findVarInFrame3(env, R_DotsSymbol, TRUE);
   R_len_t size = dots_size(dots);
   SEXP out = dots_standardize(dots, env, size);
   return out;
