@@ -134,7 +134,7 @@
 #' slicer_simple(x, 1)
 collect_subscripts <- function(i, j, ..., drop = NULL, column_transform = TRUE) {
   env <- parent.frame()
-  fmls <- formals(sys.function(sys.parent()), envir = env)
+  fmls <- formals(sys.function(sys.parent()))
 
   if (identical(env, globalenv())) {
     stop("`collect_subscripts()` must be called from within a function.", call. = FALSE)
