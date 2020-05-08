@@ -37,9 +37,9 @@ frame \code{[} methods, but array subsetting likely won't use this feature.}
 A named list of the following 6 elements containing information about the
 standardized subscripts.
 \itemize{
-\item \code{i}: The standardized \code{i} index. If \code{NULL}, \code{i} is considered to be
+\item \code{i}: The standardized \code{i} subscript. If \code{NULL}, \code{i} is considered to be
 missing.
-\item \code{j}: The standardized \code{j} index. If \code{NULL}, \code{j} is considered to be
+\item \code{j}: The standardized \code{j} subscript. If \code{NULL}, \code{j} is considered to be
 missing.
 \item \code{dots}: A list of the standardized \code{...} subscripts. If no \code{...} are
 supplied, an empty list is returned. If \code{...} are supplied and any

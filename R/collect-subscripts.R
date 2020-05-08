@@ -63,10 +63,10 @@
 #' A named list of the following 6 elements containing information about the
 #' standardized subscripts.
 #'
-#' - `i`: The standardized `i` index. If `NULL`, `i` is considered to be
+#' - `i`: The standardized `i` subscript. If `NULL`, `i` is considered to be
 #'   missing.
 #'
-#' - `j`: The standardized `j` index. If `NULL`, `j` is considered to be
+#' - `j`: The standardized `j` subscript. If `NULL`, `j` is considered to be
 #'   missing.
 #'
 #' - `dots`: A list of the standardized `...` subscripts. If no `...` are
@@ -166,7 +166,7 @@ collect_subscripts <- function(i, j, ..., drop = NULL, column_transform = TRUE) 
   drop <- drop_info$drop
   drop_missing <- drop_info$drop_missing
 
-  # Ignore `drop` when computing the number of indexers supplied
+  # Ignore `drop` when computing the number of subscripts supplied
   n_subscripts <- n_args - !drop_missing
 
   if (column_transform) {
@@ -216,7 +216,7 @@ drop_standardize <- function(drop, env, fmls) {
     stop("A `drop` argument must be supplied with a default value.")
   }
 
-  # Figure out if `drop` was user-supplied in the actual indexing call.
+  # Figure out if `drop` was user-supplied in the actual subscript call.
   # We can't check `missing(drop)` directly. Since `drop` has a default
   # value, it is only ever maybe missing in the function environment
   # where it is supplied. Otherwise it is always non-missing
