@@ -1,20 +1,22 @@
 Package: standardize
-Title: What the Package Does (One Line, Title Case)
+Title: Standardize Subscripts
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Davis",
+           family = "Vaughan",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "davis@rstudio.com")
+Description: The goal of standardize is to ease the creation of data frame and
+    array '[' methods by providing a way to standardize the subscripting
+    arguments and provide useful information about the overall call, such
+    as the number and type of arguments provided.
 License: MIT + file LICENSE
+URL: https://github.com/DavisVaughan/standardize
+BugReports: https://github.com/DavisVaughan/standardize/issues
+Suggests: 
+    covr,
+    testthat
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
-Suggests: 
-    testthat,
-    covr
-URL: https://github.com/DavisVaughan/standardize
-BugReports: https://github.com/DavisVaughan/standardize/issues
