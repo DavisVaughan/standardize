@@ -97,14 +97,16 @@ df[1, drop = FALSE]
 #> NULL
 ```
 
-It also helps with more complex array subsetting. In this casee, you
-also need to count higher dimensional subsetting in the `...`. Again,
+It also helps with more complex array subsetting. In this case, you also
+need to count higher dimensional subsetting in the `...`. Again,
 implicit dimensions should be returned as `NULL` to imply that they were
-counted but are missing.
+counted but are missing. With array subsetting, you probably don’t want
+`x[i]` to be interpreted as `x[,j]`, so you can turn that off with
+`column_transform = FALSE`.
 
 ``` r
 `[.foo_array` <- function(x, i, j, ..., drop = FALSE) {
-  info <- collect_subscripts(i, j, ..., drop = drop)
+  info <- collect_subscripts(i, j, ..., drop = drop, column_transform = FALSE)
   str(info)
 }
 ```
@@ -112,6 +114,17 @@ counted but are missing.
 ``` r
 x <- array(1:5)
 class(x) <- c("foo_array", class(x))
+
+# Not interpreted as `x[,j]`
+x[1]
+#> List of 6
+#>  $ i           : num 1
+#>  $ j           : NULL
+#>  $ dots        : list()
+#>  $ drop        : logi FALSE
+#>  $ n_args      : int 1
+#>  $ n_subscripts: int 1
+#> NULL
 
 # Compare the following results, see the implicit `NULL` in the 3rd dimension?
 x[1, 2]
