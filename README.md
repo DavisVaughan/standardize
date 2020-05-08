@@ -5,6 +5,10 @@
 
 <!-- badges: start -->
 
+[![Codecov test
+coverage](https://codecov.io/gh/DavisVaughan/standardize/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/standardize?branch=master)
+[![R build
+status](https://github.com/DavisVaughan/standardize/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/standardize/actions)
 <!-- badges: end -->
 
 The goal of standardize is to ease the creation of data frame and array
