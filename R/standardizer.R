@@ -1,6 +1,24 @@
-standardizer <- function(i, ..., j = NULL, drop = NULL, env = parent.frame()) {
+#' Standardize slicing indices
+#'
+#' @description
+#' `standardizer()` standardizes slicing indices to make it easier to develop
+#' `[` methods. It takes care of turning missing indices into explicit
+#' `NULL`s, tells you how many indexing arguments were provided by the user,
+#' and standardizes `x[i]` into `x[,j]`.
+#'
+#' @details
+#'
+#'
+#' @param i `[vector]`
+#'
+#'   A vector of indices
+#'
+standardizer <- function(i, j, ..., drop = NULL, env = parent.frame()) {
   if (n_dots(...) != 0L) {
-    stop("`...` must be empty.")
+    stop("`...` must be empty.", call. = FALSE)
+  }
+  if (identical(env, globalenv())) {
+    stop("`standardizer()` must be called from within a function.", call. = FALSE)
   }
 
   # Ignore `x` when counting the number of args
@@ -10,7 +28,16 @@ standardizer <- function(i, ..., j = NULL, drop = NULL, env = parent.frame()) {
 
   i_missing <- eval_bare(quote(missing(i)), env)
   j_missing <- eval_bare(quote(missing(j)), env)
-  drop_missing <- eval_bare(quote(missing(drop)), env)
+
+  # Allows `drop` to be optional.
+  # Assumes that if the user's signature has `drop`, then it is given
+  # a default like `drop = FALSE`. A `drop` with no default that isn't
+  # provided will look like it is missing here.
+  if (missing(drop)) {
+    drop_missing <- TRUE
+  } else {
+    drop_missing <- eval_bare(quote(missing(drop)), env)
+  }
 
   i <- arg_standardize(i, i_missing)
   j <- arg_standardize(j, j_missing)
