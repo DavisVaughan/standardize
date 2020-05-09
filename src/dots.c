@@ -95,12 +95,36 @@ static void dots_standardize_named(SEXP out,
   UNPROTECT(1);
 }
 
+// -----------------------------------------------------------------------------
+
+static inline SEXP dot_prom_eval(SEXP dot, SEXP env);
+
 // Missing dot positions are replaced with `NULL`,
 // otherwise the promise is evaluated.
 static inline SEXP dot_eval(SEXP dot, SEXP env) {
+  if (TYPEOF(dot) == PROMSXP) {
+    return dot_prom_eval(dot, env);
+  }
+
   if (dot == R_MissingArg) {
     return R_NilValue;
   } else {
+    // TODO: Would this ever happen?
     return Rf_eval(dot, env);
   }
 }
+
+// On R <= 3.4.4 a missing dot is not directly `R_MissingArg`,
+// but instead is a promise with a code of `R_MissingArg`.
+// I'm not exactly sure where this change takes place, somewhere between
+// 3.4.4 - 3.5.3, but this code should work regardless.
+static inline SEXP dot_prom_eval(SEXP dot, SEXP env) {
+  SEXP code = PRCODE(dot);
+
+  if (code == R_MissingArg) {
+    return R_NilValue;
+  } else {
+    return Rf_eval(code, env);
+  }
+}
+
