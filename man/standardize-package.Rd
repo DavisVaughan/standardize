@@ -4,9 +4,12 @@
 \name{standardize-package}
 \alias{standardize}
 \alias{standardize-package}
-\title{standardize: What the Package Does (One Line, Title Case)}
+\title{standardize: Standardize Subscripts}
 \description{
-What the package does (one paragraph).
+The goal of standardize is to ease the creation of data frame and
+    array '[' methods by providing a way to standardize the subscripting
+    arguments and provide useful information about the overall call, such
+    as the number and type of arguments provided.
 }
 \seealso{
 Useful links:
@@ -17,7 +20,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Davis Vaughan \email{davis@rstudio.com}
 
 }
 \keyword{internal}
