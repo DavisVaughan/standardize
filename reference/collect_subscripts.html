@@ -185,7 +185,7 @@ frame <code>[</code> methods, but array subsetting likely won't use this feature
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list of the following 6 elements containing information about the
+    <p>A named list of the following 7 elements containing information about the
 standardized subscripts.</p><ul>
 <li><p><code>i</code>: The standardized <code>i</code> subscript. If <code>NULL</code>, <code>i</code> is considered to be
 missing.</p></li>
@@ -197,6 +197,11 @@ subscripts are missing, <code>NULL</code> values are returned in those locations
 For example, <code>x[i, j, , k]</code> would return a list of <code><a href='https://rdrr.io/r/base/list.html'>list(NULL, k)</a></code>.</p></li>
 <li><p><code>drop</code>: The standardized <code>drop</code> argument. If <code>drop</code> is not provided,
 this is <code>NULL</code>.</p></li>
+<li><p><code>missing</code>: A named list of 3 elements, <code>i</code>, <code>j</code>, and <code>drop</code>, each of which
+are logical vectors of size 1 stating whether or not the argument was
+supplied by the user. Note that if <code>x[i]</code> is standardized to <code>x[,j]</code>,
+then <code>i</code> won't be missing even though its value is <code>NULL</code>. Additionally,
+<code>j</code> will be missing even though it will have a value.</p></li>
 <li><p><code>n_args</code>: The total number of subscript-related arguments supplied. This
 includes all arguments in the <code>[</code> call <em>except</em> for the object being
 subset, <code>x</code>. Missing arguments are counted here. For example, <code>x[1,]</code>
@@ -232,56 +237,80 @@ subscript should have the same meaning as <code><a href='https://rdrr.io/r/base/
 <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='st'>"a"</span>
 
 <span class='co'># Standardize an easy case</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>:<span class='fl'>5</span>, <span class='fl'>2</span>)</div><div class='output co'>#&gt; List of 6
+<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>:<span class='fl'>5</span>, <span class='fl'>2</span>)</div><div class='output co'>#&gt; List of 7
 #&gt;  $ i           : int [1:5] 1 2 3 4 5
 #&gt;  $ j           : num 2
 #&gt;  $ dots        : list()
 #&gt;  $ drop        : logi FALSE
+#&gt;  $ missing     :List of 3
+#&gt;   ..$ i   : logi FALSE
+#&gt;   ..$ j   : logi FALSE
+#&gt;   ..$ drop: logi TRUE
 #&gt;  $ n_args      : int 2
 #&gt;  $ n_subscripts: int 2</div><div class='input'>
 <span class='co'># By default, supplying just `i` standardizes `x[i]` to `x[,j]`</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>)</div><div class='output co'>#&gt; List of 6
+<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>)</div><div class='output co'>#&gt; List of 7
 #&gt;  $ i           : NULL
 #&gt;  $ j           : num 1
 #&gt;  $ dots        : list()
 #&gt;  $ drop        : logi FALSE
+#&gt;  $ missing     :List of 3
+#&gt;   ..$ i   : logi FALSE
+#&gt;   ..$ j   : logi TRUE
+#&gt;   ..$ drop: logi TRUE
 #&gt;  $ n_args      : int 1
 #&gt;  $ n_subscripts: int 1</div><div class='input'>
 <span class='co'># With just `j`, the implicit missing `i` value is returned as a `NULL`.</span>
 <span class='co'># Note that while `i` and `j` are the same for this and `slicer(x, 1)`,</span>
 <span class='co'># the `n_*` counters are different.</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, , <span class='fl'>1</span>)</div><div class='output co'>#&gt; List of 6
+<span class='fu'>slicer</span>(<span class='no'>x</span>, , <span class='fl'>1</span>)</div><div class='output co'>#&gt; List of 7
 #&gt;  $ i           : NULL
 #&gt;  $ j           : num 1
 #&gt;  $ dots        : list()
 #&gt;  $ drop        : logi FALSE
+#&gt;  $ missing     :List of 3
+#&gt;   ..$ i   : logi TRUE
+#&gt;   ..$ j   : logi FALSE
+#&gt;   ..$ drop: logi TRUE
 #&gt;  $ n_args      : int 2
 #&gt;  $ n_subscripts: int 2</div><div class='input'>
 <span class='co'># This would be equivalent to calling `x[]`</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, )</div><div class='output co'>#&gt; List of 6
+<span class='fu'>slicer</span>(<span class='no'>x</span>, )</div><div class='output co'>#&gt; List of 7
 #&gt;  $ i           : NULL
 #&gt;  $ j           : NULL
 #&gt;  $ dots        : list()
 #&gt;  $ drop        : logi FALSE
+#&gt;  $ missing     :List of 3
+#&gt;   ..$ i   : logi TRUE
+#&gt;   ..$ j   : logi TRUE
+#&gt;   ..$ drop: logi TRUE
 #&gt;  $ n_args      : int 1
 #&gt;  $ n_subscripts: int 1</div><div class='input'>
 <span class='co'># Extra `...` are standardized too. Again, implicit dimensions are returned</span>
 <span class='co'># as `NULL`.</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>3</span>)</div><div class='output co'>#&gt; List of 6
+<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>3</span>)</div><div class='output co'>#&gt; List of 7
 #&gt;  $ i           : num 1
 #&gt;  $ j           : num 2
 #&gt;  $ dots        :List of 1
 #&gt;   ..$ : num 3
 #&gt;  $ drop        : logi FALSE
+#&gt;  $ missing     :List of 3
+#&gt;   ..$ i   : logi FALSE
+#&gt;   ..$ j   : logi FALSE
+#&gt;   ..$ drop: logi TRUE
 #&gt;  $ n_args      : int 3
 #&gt;  $ n_subscripts: int 3</div><div class='input'>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, , <span class='fl'>3</span>)</div><div class='output co'>#&gt; List of 6
+<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, , <span class='fl'>3</span>)</div><div class='output co'>#&gt; List of 7
 #&gt;  $ i           : num 1
 #&gt;  $ j           : num 2
 #&gt;  $ dots        :List of 2
 #&gt;   ..$ : NULL
 #&gt;   ..$ : num 3
 #&gt;  $ drop        : logi FALSE
+#&gt;  $ missing     :List of 3
+#&gt;   ..$ i   : logi FALSE
+#&gt;   ..$ j   : logi FALSE
+#&gt;   ..$ drop: logi TRUE
 #&gt;  $ n_args      : int 4
 #&gt;  $ n_subscripts: int 4</div><div class='input'>
 
@@ -305,6 +334,17 @@ subscript should have the same meaning as <code><a href='https://rdrr.io/r/base/
 #&gt; 
 #&gt; $drop
 #&gt; NULL
+#&gt; 
+#&gt; $missing
+#&gt; $missing$i
+#&gt; [1] FALSE
+#&gt; 
+#&gt; $missing$j
+#&gt; [1] TRUE
+#&gt; 
+#&gt; $missing$drop
+#&gt; [1] TRUE
+#&gt; 
 #&gt; 
 #&gt; $n_args
 #&gt; [1] 1
