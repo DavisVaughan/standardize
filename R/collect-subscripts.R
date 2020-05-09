@@ -60,7 +60,7 @@
 #'   frame `[` methods, but array subsetting likely won't use this feature.
 #'
 #' @return
-#' A named list of the following 6 elements containing information about the
+#' A named list of the following 7 elements containing information about the
 #' standardized subscripts.
 #'
 #' - `i`: The standardized `i` subscript. If `NULL`, `i` is considered to be
@@ -76,6 +76,12 @@
 #'
 #' - `drop`: The standardized `drop` argument. If `drop` is not provided,
 #'   this is `NULL`.
+#'
+#' - `missing`: A named list of 3 elements, `i`, `j`, and `drop`, each of which
+#'   are logical vectors of size 1 stating whether or not the argument was
+#'   supplied by the user. Note that if `x[i]` is standardized to `x[,j]`,
+#'   then `i` won't be missing even though its value is `NULL`. Additionally,
+#'   `j` will be missing even though it will have a value.
 #'
 #' - `n_args`: The total number of subscript-related arguments supplied. This
 #'   includes all arguments in the `[` call _except_ for the object being
@@ -176,11 +182,18 @@ collect_subscripts <- function(i, j, ..., drop = NULL, column_transform = TRUE) 
     }
   }
 
+  missing <- list(
+    i = i_missing,
+    j = j_missing,
+    drop = drop_missing
+  )
+
   list(
     i = i,
     j = j,
     dots = dots,
     drop = drop,
+    missing = missing,
     n_args = n_args,
     n_subscripts = n_subscripts
   )

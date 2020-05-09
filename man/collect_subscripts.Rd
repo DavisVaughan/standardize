@@ -34,7 +34,7 @@ this standardizes \code{x[i]} to \code{x[,j]}. This is useful when creating data
 frame \code{[} methods, but array subsetting likely won't use this feature.}
 }
 \value{
-A named list of the following 6 elements containing information about the
+A named list of the following 7 elements containing information about the
 standardized subscripts.
 \itemize{
 \item \code{i}: The standardized \code{i} subscript. If \code{NULL}, \code{i} is considered to be
@@ -47,6 +47,11 @@ subscripts are missing, \code{NULL} values are returned in those locations.
 For example, \code{x[i, j, , k]} would return a list of \code{list(NULL, k)}.
 \item \code{drop}: The standardized \code{drop} argument. If \code{drop} is not provided,
 this is \code{NULL}.
+\item \code{missing}: A named list of 3 elements, \code{i}, \code{j}, and \code{drop}, each of which
+are logical vectors of size 1 stating whether or not the argument was
+supplied by the user. Note that if \code{x[i]} is standardized to \code{x[,j]},
+then \code{i} won't be missing even though its value is \code{NULL}. Additionally,
+\code{j} will be missing even though it will have a value.
 \item \code{n_args}: The total number of subscript-related arguments supplied. This
 includes all arguments in the \code{[} call \emph{except} for the object being
 subset, \code{x}. Missing arguments are counted here. For example, \code{x[1,]}
