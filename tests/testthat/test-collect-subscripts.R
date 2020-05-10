@@ -141,3 +141,9 @@ test_that("`NULL` i and j are transformed to `integer()`", {
   expect_identical(x$i, integer())
   expect_identical(y$j, integer())
 })
+
+test_that("`NULL` dots are transformed to `integer()`", {
+  x <- slicer(,,NULL)
+
+  expect_identical(x$dots, list(integer()))
+})

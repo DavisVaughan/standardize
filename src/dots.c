@@ -97,6 +97,7 @@ static void dots_standardize_named(SEXP out,
 
 // -----------------------------------------------------------------------------
 
+static inline SEXP new_empty_integer();
 static inline SEXP dot_prom_eval(SEXP dot, SEXP env);
 
 // Missing dot positions are replaced with `NULL`,
@@ -108,9 +109,15 @@ static inline SEXP dot_eval(SEXP dot, SEXP env) {
 
   if (dot == R_MissingArg) {
     return R_NilValue;
+  }
+
+  // TODO: Would it ever get here?
+  SEXP out = Rf_eval(dot, env);
+
+  if (out == R_NilValue) {
+    return new_empty_integer();
   } else {
-    // TODO: Would this ever happen?
-    return Rf_eval(dot, env);
+    return out;
   }
 }
 
@@ -123,8 +130,17 @@ static inline SEXP dot_prom_eval(SEXP dot, SEXP env) {
 
   if (code == R_MissingArg) {
     return R_NilValue;
+  }
+
+  SEXP out = Rf_eval(code, env);
+
+  if (out == R_NilValue) {
+    return new_empty_integer();
   } else {
-    return Rf_eval(code, env);
+    return out;
   }
 }
 
+static inline SEXP new_empty_integer() {
+  return Rf_allocVector(INTSXP, 0);
+}
