@@ -147,3 +147,75 @@ test_that("`NULL` dots are transformed to `integer()`", {
 
   expect_identical(x$dots, list(integer()))
 })
+
+# ------------------------------------------------------------------------------
+# no dots
+
+test_that("dots are optional", {
+  x <- slicer_no_dots()
+
+  expect_identical(x$i, NULL)
+  expect_identical(x$j, NULL)
+  expect_identical(x$dots, list())
+
+  x <- slicer_no_dots(1)
+
+  expect_identical(x$i, NULL)
+  expect_identical(x$j, 1)
+  expect_identical(x$dots, list())
+
+  x <- slicer_no_dots(1,)
+
+  expect_identical(x$i, 1)
+  expect_identical(x$j, NULL)
+  expect_identical(x$dots, list())
+
+  x <- slicer_no_dots(,1)
+
+  expect_identical(x$i, NULL)
+  expect_identical(x$j, 1)
+  expect_identical(x$dots, list())
+})
+
+# ------------------------------------------------------------------------------
+# Misc
+
+test_that("can handle any number of extra args in the caller", {
+  slicer <- function(x, i, j, ..., foo = 1, bar, drop = FALSE) {
+    collect_subscripts(i, j, ...)
+  }
+
+  x <- slicer("a", 1)
+
+  expect_identical(x$i, NULL)
+  expect_identical(x$j, 1)
+  expect_identical(x$dots, list())
+
+  x <- slicer("a", 1,)
+
+  expect_identical(x$i, 1)
+  expect_identical(x$j, NULL)
+  expect_identical(x$dots, list())
+})
+
+test_that("can be doubly wrapped and manually passed env and fn", {
+  wrapper <- function(i, j, ..., env = parent.frame(), fn = sys.function(sys.parent())) {
+    collect_subscripts(i, j, ..., env = env, fn = fn)
+  }
+
+  slicer <- function(x, i, j, ..., drop = FALSE) {
+    wrapper(i, j, ...)
+  }
+
+  x <- slicer("a", 1)
+
+  expect_identical(x$i, NULL)
+  expect_identical(x$j, 1)
+  expect_identical(x$dots, list())
+
+  x <- slicer("a", 1,)
+
+  expect_identical(x$i, 1)
+  expect_identical(x$j, NULL)
+  expect_identical(x$dots, list())
+})
