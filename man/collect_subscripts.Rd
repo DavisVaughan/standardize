@@ -4,7 +4,14 @@
 \alias{collect_subscripts}
 \title{Standardize subscripts}
 \usage{
-collect_subscripts(i, j, ..., drop = NULL, column_transform = TRUE)
+collect_subscripts(
+  i,
+  j,
+  ...,
+  column_transform = TRUE,
+  env = parent.frame(),
+  fn = sys.function(sys.parent())
+)
 }
 \arguments{
 \item{i, j}{\verb{[vector]}
@@ -20,21 +27,25 @@ are preserved. Implicit missing subscripts are transformed into explicit
 If no \code{...} are provided, the return value will contain an empty list
 in the \verb{$dots} slot.}
 
-\item{drop}{\verb{[NULL / logical(1)]}
-
-Optional argument to capture \code{drop}. If your \code{[} method signature
-doesn't include a \code{drop} argument, don't supply this argument. If
-it does, it is required that \code{drop} has a default value in your method. It
-is recommended to default this to \code{drop = FALSE} in your method.}
-
 \item{column_transform}{\verb{[logical(1)]}
 
 Should a single \code{i} argument represent column subsetting? For example,
 this standardizes \code{x[i]} to \code{x[,j]}. This is useful when creating data
 frame \code{[} methods, but array subsetting likely won't use this feature.}
+
+\item{env}{\verb{[environment]}
+
+Generally, the calling environment of the \code{[} method. Used to detect
+the number of arguments supplied when the user invoked the \code{[} method.}
+
+\item{fn}{\verb{[function]}
+
+Generally, the function corresponding to the \code{[} method. Used to check
+that the \code{[} method is valid, and to count the number of arguments
+alongside \code{env}.}
 }
 \value{
-A named list of the following 7 elements containing information about the
+A named list of the following 3 elements containing information about the
 standardized subscripts.
 \itemize{
 \item \code{i}: The standardized \code{i} subscript. If \code{NULL}, \code{i} is considered to be
@@ -45,21 +56,6 @@ missing.
 supplied, an empty list is returned. If \code{...} are supplied and any
 subscripts are missing, \code{NULL} values are returned in those locations.
 For example, \code{x[i, j, , k]} would return a list of \code{list(NULL, k)}.
-\item \code{drop}: The standardized \code{drop} argument. If \code{drop} is not provided,
-this is \code{NULL}.
-\item \code{missing}: A named list of 3 elements, \code{i}, \code{j}, and \code{drop}, each of which
-are logical vectors of size 1 stating whether or not the argument was
-supplied by the user. Note that if \code{x[i]} is standardized to \code{x[,j]},
-then \code{i} won't be missing even though its value is \code{NULL}. Additionally,
-\code{j} will be missing even though it will have a value.
-\item \code{n_args}: The total number of subscript-related arguments supplied. This
-includes all arguments in the \code{[} call \emph{except} for the object being
-subset, \code{x}. Missing arguments are counted here. For example, \code{x[1,]}
-has a \code{n_args} value of \code{2} because \code{i} is supplied and \code{j} is supplied
-but missing. On the other hand, \code{x[i]} has a \code{n_args} value of \code{1}.
-\item \code{n_subscripts}: The total number of subscript arguments supplied. This
-counts \code{i}, \code{j}, and \code{...} arguments. It is only different drop \code{n_args}
-if \code{drop} is directly supplied by the end user.
 }
 }
 \description{
@@ -69,7 +65,7 @@ It helps with a number of things, including:
 \itemize{
 \item Counting the number of subscript arguments supplied.
 \item Transforming implicit missing subscripts into explicit \code{NULL} values.
-\item Optional support for capturing \code{...} and \code{drop}.
+\item Optional support for capturing \code{...}.
 \item Optional support for standardizing the data frame column subsetting
 behavior of \code{x[i]} into \code{x[,j]}.
 }
@@ -83,12 +79,6 @@ a \code{[} method. You'll collect the processed subscripts, and then use
 them to slice the input accordingly.
 }
 \details{
-When counting arguments, \code{collect_subscripts()} assumes that 1 argument
-is reserved for \code{x} and will subtract it from the total number of arguments.
-If you are implementing a \code{[} method, this is automatically enforced by the
-method signature. If you are calling \code{collect_subscripts()} from somewhere
-else, keep this in mind when inspecting the results.
-
 If \code{NULL} is provided as a subscript, it is standardized to \code{integer()} to
 prevent confusion with \code{NULL} values in the resulting info list. A \code{NULL}
 subscript should have the same meaning as \code{integer()}.
@@ -100,7 +90,7 @@ subscript should have the same meaning as \code{integer()}.
 # results to slice `x`.
 
 slicer <- function(x, i, j, ..., drop = FALSE) {
-  info <- collect_subscripts(i, j, ..., drop = drop)
+  info <- collect_subscripts(i, j, ...)
   str(info)
 }
 
@@ -113,8 +103,6 @@ slicer(x, 1:5, 2)
 slicer(x, 1)
 
 # With just `j`, the implicit missing `i` value is returned as a `NULL`.
-# Note that while `i` and `j` are the same for this and `slicer(x, 1)`,
-# the `n_*` counters are different.
 slicer(x, , 1)
 
 # This would be equivalent to calling `x[]`
@@ -123,18 +111,15 @@ slicer(x, )
 # Extra `...` are standardized too. Again, implicit dimensions are returned
 # as `NULL`.
 slicer(x, 1, 2, 3)
-
 slicer(x, 1, 2, , 3)
 
 
-# You don't have to supply `...` and `drop` if you don't need it. This
+# You don't have to supply `...` if you don't need it. This
 # won't be as useful because it isn't as complex to count here, but it
 # will still standardize `x[i]`, which is nice.
 slicer_simple <- function(x, i, j) {
   collect_subscripts(i, j)
 }
 
-# Note that `drop` is returned as `NULL` here, since it isn't in your
-# function signature.
 slicer_simple(x, 1)
 }

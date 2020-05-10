@@ -53,7 +53,7 @@ your `[` method and pass it all the subscript related information.
 
 ``` r
 `[.foo_df` <- function(x, i, j, drop = FALSE) {
-  info <- collect_subscripts(i, j, drop = drop)
+  info <- collect_subscripts(i, j)
   str(info)
 }
 ```
@@ -69,35 +69,26 @@ class(df) <- c("foo_df", class(df))
 
 # Column subsetting, standardized to `i = NULL, j = 1`
 df[1]
-#> List of 6
-#>  $ i           : NULL
-#>  $ j           : num 1
-#>  $ dots        : list()
-#>  $ drop        : logi FALSE
-#>  $ n_args      : int 1
-#>  $ n_subscripts: int 1
+#> List of 3
+#>  $ i   : NULL
+#>  $ j   : num 1
+#>  $ dots: list()
 #> NULL
 
 # Row subsetting with implicit `j = NULL`
 df[1,]
-#> List of 6
-#>  $ i           : num 1
-#>  $ j           : NULL
-#>  $ dots        : list()
-#>  $ drop        : logi FALSE
-#>  $ n_args      : int 2
-#>  $ n_subscripts: int 2
+#> List of 3
+#>  $ i   : num 1
+#>  $ j   : NULL
+#>  $ dots: list()
 #> NULL
 
 # Still considered column subsetting
 df[1, drop = FALSE]
-#> List of 6
-#>  $ i           : NULL
-#>  $ j           : num 1
-#>  $ dots        : list()
-#>  $ drop        : logi FALSE
-#>  $ n_args      : int 2
-#>  $ n_subscripts: int 1
+#> List of 3
+#>  $ i   : NULL
+#>  $ j   : num 1
+#>  $ dots: list()
 #> NULL
 ```
 
@@ -110,7 +101,7 @@ counted but are missing. With array subsetting, you probably don’t want
 
 ``` r
 `[.foo_array` <- function(x, i, j, ..., drop = FALSE) {
-  info <- collect_subscripts(i, j, ..., drop = drop, column_transform = FALSE)
+  info <- collect_subscripts(i, j, ..., column_transform = FALSE)
   str(info)
 }
 ```
@@ -121,49 +112,37 @@ class(x) <- c("foo_array", class(x))
 
 # Not interpreted as `x[,j]`
 x[1]
-#> List of 6
-#>  $ i           : num 1
-#>  $ j           : NULL
-#>  $ dots        : list()
-#>  $ drop        : logi FALSE
-#>  $ n_args      : int 1
-#>  $ n_subscripts: int 1
+#> List of 3
+#>  $ i   : num 1
+#>  $ j   : NULL
+#>  $ dots: list()
 #> NULL
 
 # Compare the following results, see the implicit `NULL` in the 3rd dimension?
 x[1, 2]
-#> List of 6
-#>  $ i           : num 1
-#>  $ j           : num 2
-#>  $ dots        : list()
-#>  $ drop        : logi FALSE
-#>  $ n_args      : int 2
-#>  $ n_subscripts: int 2
+#> List of 3
+#>  $ i   : num 1
+#>  $ j   : num 2
+#>  $ dots: list()
 #> NULL
 x[1, 2,]
-#> List of 6
-#>  $ i           : num 1
-#>  $ j           : num 2
-#>  $ dots        :List of 1
+#> List of 3
+#>  $ i   : num 1
+#>  $ j   : num 2
+#>  $ dots:List of 1
 #>   ..$ : NULL
-#>  $ drop        : logi FALSE
-#>  $ n_args      : int 3
-#>  $ n_subscripts: int 3
 #> NULL
 
 # Things can get a little crazy in high dimensional space, but this should
 # be fairly interpretable.
 x[1, 2, , 3, , 5, drop = TRUE]
-#> List of 6
-#>  $ i           : num 1
-#>  $ j           : num 2
-#>  $ dots        :List of 4
+#> List of 3
+#>  $ i   : num 1
+#>  $ j   : num 2
+#>  $ dots:List of 4
 #>   ..$ : NULL
 #>   ..$ : num 3
 #>   ..$ : NULL
 #>   ..$ : num 5
-#>  $ drop        : logi TRUE
-#>  $ n_args      : int 7
-#>  $ n_subscripts: int 6
 #> NULL
 ```

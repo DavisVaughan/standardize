@@ -52,7 +52,7 @@ The goal of standardize is to help with this by standardizing these arguments in
 
 ```{r}
 `[.foo_df` <- function(x, i, j, drop = FALSE) {
-  info <- collect_subscripts(i, j, drop = drop)
+  info <- collect_subscripts(i, j)
   str(info)
 }
 ```
@@ -76,7 +76,7 @@ It also helps with more complex array subsetting. In this case, you also need to
 
 ```{r}
 `[.foo_array` <- function(x, i, j, ..., drop = FALSE) {
-  info <- collect_subscripts(i, j, ..., drop = drop, column_transform = FALSE)
+  info <- collect_subscripts(i, j, ..., column_transform = FALSE)
   str(info)
 }
 ```
