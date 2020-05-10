@@ -45,7 +45,7 @@ develop [ methods, especially for data frame and array subsetting.
 It helps with a number of things, including:
 Counting the number of subscript arguments supplied.
 Transforming implicit missing subscripts into explicit NULL values.
-Optional support for capturing ... and drop.
+Optional support for capturing ....
 Optional support for standardizing the data frame column subsetting
 behavior of x[i] into x[,j].
 
@@ -134,7 +134,7 @@ develop <code>[</code> methods, especially for data frame and array subsetting.
 It helps with a number of things, including:</p><ul>
 <li><p>Counting the number of subscript arguments supplied.</p></li>
 <li><p>Transforming implicit missing subscripts into explicit <code>NULL</code> values.</p></li>
-<li><p>Optional support for capturing <code>...</code> and <code>drop</code>.</p></li>
+<li><p>Optional support for capturing <code>...</code>.</p></li>
 <li><p>Optional support for standardizing the data frame column subsetting
 behavior of <code>x[i]</code> into <code>x[,j]</code>.</p></li>
 </ul>
@@ -147,7 +147,14 @@ a <code>[</code> method. You'll collect the processed subscripts, and then use
 them to slice the input accordingly.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>collect_subscripts</span>(<span class='no'>i</span>, <span class='no'>j</span>, <span class='no'>...</span>, <span class='kw'>drop</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>column_transform</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>collect_subscripts</span>(
+  <span class='no'>i</span>,
+  <span class='no'>j</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>column_transform</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>env</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
+  <span class='kw'>fn</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>sys.function</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>sys.parent</a></span>())
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -167,25 +174,30 @@ are preserved. Implicit missing subscripts are transformed into explicit
 in the <code>$dots</code> slot.</p></td>
     </tr>
     <tr>
-      <th>drop</th>
-      <td><p><code>[NULL / logical(1)]</code></p>
-<p>Optional argument to capture <code>drop</code>. If your <code>[</code> method signature
-doesn't include a <code>drop</code> argument, don't supply this argument. If
-it does, it is required that <code>drop</code> has a default value in your method. It
-is recommended to default this to <code>drop = FALSE</code> in your method.</p></td>
-    </tr>
-    <tr>
       <th>column_transform</th>
       <td><p><code>[logical(1)]</code></p>
 <p>Should a single <code>i</code> argument represent column subsetting? For example,
 this standardizes <code>x[i]</code> to <code>x[,j]</code>. This is useful when creating data
 frame <code>[</code> methods, but array subsetting likely won't use this feature.</p></td>
     </tr>
+    <tr>
+      <th>env</th>
+      <td><p><code>[environment]</code></p>
+<p>Generally, the calling environment of the <code>[</code> method. Used to detect
+the number of arguments supplied when the user invoked the <code>[</code> method.</p></td>
+    </tr>
+    <tr>
+      <th>fn</th>
+      <td><p><code>[function]</code></p>
+<p>Generally, the function corresponding to the <code>[</code> method. Used to check
+that the <code>[</code> method is valid, and to count the number of arguments
+alongside <code>env</code>.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list of the following 7 elements containing information about the
+    <p>A named list of the following 3 elements containing information about the
 standardized subscripts.</p><ul>
 <li><p><code>i</code>: The standardized <code>i</code> subscript. If <code>NULL</code>, <code>i</code> is considered to be
 missing.</p></li>
@@ -195,31 +207,11 @@ missing.</p></li>
 supplied, an empty list is returned. If <code>...</code> are supplied and any
 subscripts are missing, <code>NULL</code> values are returned in those locations.
 For example, <code>x[i, j, , k]</code> would return a list of <code><a href='https://rdrr.io/r/base/list.html'>list(NULL, k)</a></code>.</p></li>
-<li><p><code>drop</code>: The standardized <code>drop</code> argument. If <code>drop</code> is not provided,
-this is <code>NULL</code>.</p></li>
-<li><p><code>missing</code>: A named list of 3 elements, <code>i</code>, <code>j</code>, and <code>drop</code>, each of which
-are logical vectors of size 1 stating whether or not the argument was
-supplied by the user. Note that if <code>x[i]</code> is standardized to <code>x[,j]</code>,
-then <code>i</code> won't be missing even though its value is <code>NULL</code>. Additionally,
-<code>j</code> will be missing even though it will have a value.</p></li>
-<li><p><code>n_args</code>: The total number of subscript-related arguments supplied. This
-includes all arguments in the <code>[</code> call <em>except</em> for the object being
-subset, <code>x</code>. Missing arguments are counted here. For example, <code>x[1,]</code>
-has a <code>n_args</code> value of <code>2</code> because <code>i</code> is supplied and <code>j</code> is supplied
-but missing. On the other hand, <code>x[i]</code> has a <code>n_args</code> value of <code>1</code>.</p></li>
-<li><p><code>n_subscripts</code>: The total number of subscript arguments supplied. This
-counts <code>i</code>, <code>j</code>, and <code>...</code> arguments. It is only different drop <code>n_args</code>
-if <code>drop</code> is directly supplied by the end user.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>When counting arguments, <code>collect_subscripts()</code> assumes that 1 argument
-is reserved for <code>x</code> and will subtract it from the total number of arguments.
-If you are implementing a <code>[</code> method, this is automatically enforced by the
-method signature. If you are calling <code>collect_subscripts()</code> from somewhere
-else, keep this in mind when inspecting the results.</p>
-<p>If <code>NULL</code> is provided as a subscript, it is standardized to <code><a href='https://rdrr.io/r/base/integer.html'>integer()</a></code> to
+    <p>If <code>NULL</code> is provided as a subscript, it is standardized to <code><a href='https://rdrr.io/r/base/integer.html'>integer()</a></code> to
 prevent confusion with <code>NULL</code> values in the resulting info list. A <code>NULL</code>
 subscript should have the same meaning as <code><a href='https://rdrr.io/r/base/integer.html'>integer()</a></code>.</p>
 
@@ -230,99 +222,52 @@ subscript should have the same meaning as <code><a href='https://rdrr.io/r/base/
 <span class='co'># results to slice `x`.</span>
 
 <span class='no'>slicer</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>, <span class='no'>i</span>, <span class='no'>j</span>, <span class='no'>...</span>, <span class='no'>drop</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>) {
-  <span class='no'>info</span> <span class='kw'>&lt;-</span> <span class='fu'>collect_subscripts</span>(<span class='no'>i</span>, <span class='no'>j</span>, <span class='no'>...</span>, <span class='kw'>drop</span> <span class='kw'>=</span> <span class='no'>drop</span>)
+  <span class='no'>info</span> <span class='kw'>&lt;-</span> <span class='fu'>collect_subscripts</span>(<span class='no'>i</span>, <span class='no'>j</span>, <span class='no'>...</span>)
   <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>info</span>)
 }
 
 <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='st'>"a"</span>
 
 <span class='co'># Standardize an easy case</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>:<span class='fl'>5</span>, <span class='fl'>2</span>)</div><div class='output co'>#&gt; List of 7
-#&gt;  $ i           : int [1:5] 1 2 3 4 5
-#&gt;  $ j           : num 2
-#&gt;  $ dots        : list()
-#&gt;  $ drop        : logi FALSE
-#&gt;  $ missing     :List of 3
-#&gt;   ..$ i   : logi FALSE
-#&gt;   ..$ j   : logi FALSE
-#&gt;   ..$ drop: logi TRUE
-#&gt;  $ n_args      : int 2
-#&gt;  $ n_subscripts: int 2</div><div class='input'>
+<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>:<span class='fl'>5</span>, <span class='fl'>2</span>)</div><div class='output co'>#&gt; List of 3
+#&gt;  $ i   : int [1:5] 1 2 3 4 5
+#&gt;  $ j   : num 2
+#&gt;  $ dots: list()</div><div class='input'>
 <span class='co'># By default, supplying just `i` standardizes `x[i]` to `x[,j]`</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>)</div><div class='output co'>#&gt; List of 7
-#&gt;  $ i           : NULL
-#&gt;  $ j           : num 1
-#&gt;  $ dots        : list()
-#&gt;  $ drop        : logi FALSE
-#&gt;  $ missing     :List of 3
-#&gt;   ..$ i   : logi FALSE
-#&gt;   ..$ j   : logi TRUE
-#&gt;   ..$ drop: logi TRUE
-#&gt;  $ n_args      : int 1
-#&gt;  $ n_subscripts: int 1</div><div class='input'>
+<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>)</div><div class='output co'>#&gt; List of 3
+#&gt;  $ i   : NULL
+#&gt;  $ j   : num 1
+#&gt;  $ dots: list()</div><div class='input'>
 <span class='co'># With just `j`, the implicit missing `i` value is returned as a `NULL`.</span>
-<span class='co'># Note that while `i` and `j` are the same for this and `slicer(x, 1)`,</span>
-<span class='co'># the `n_*` counters are different.</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, , <span class='fl'>1</span>)</div><div class='output co'>#&gt; List of 7
-#&gt;  $ i           : NULL
-#&gt;  $ j           : num 1
-#&gt;  $ dots        : list()
-#&gt;  $ drop        : logi FALSE
-#&gt;  $ missing     :List of 3
-#&gt;   ..$ i   : logi TRUE
-#&gt;   ..$ j   : logi FALSE
-#&gt;   ..$ drop: logi TRUE
-#&gt;  $ n_args      : int 2
-#&gt;  $ n_subscripts: int 2</div><div class='input'>
+<span class='fu'>slicer</span>(<span class='no'>x</span>, , <span class='fl'>1</span>)</div><div class='output co'>#&gt; List of 3
+#&gt;  $ i   : NULL
+#&gt;  $ j   : num 1
+#&gt;  $ dots: list()</div><div class='input'>
 <span class='co'># This would be equivalent to calling `x[]`</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, )</div><div class='output co'>#&gt; List of 7
-#&gt;  $ i           : NULL
-#&gt;  $ j           : NULL
-#&gt;  $ dots        : list()
-#&gt;  $ drop        : logi FALSE
-#&gt;  $ missing     :List of 3
-#&gt;   ..$ i   : logi TRUE
-#&gt;   ..$ j   : logi TRUE
-#&gt;   ..$ drop: logi TRUE
-#&gt;  $ n_args      : int 1
-#&gt;  $ n_subscripts: int 1</div><div class='input'>
+<span class='fu'>slicer</span>(<span class='no'>x</span>, )</div><div class='output co'>#&gt; List of 3
+#&gt;  $ i   : NULL
+#&gt;  $ j   : NULL
+#&gt;  $ dots: list()</div><div class='input'>
 <span class='co'># Extra `...` are standardized too. Again, implicit dimensions are returned</span>
 <span class='co'># as `NULL`.</span>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>3</span>)</div><div class='output co'>#&gt; List of 7
-#&gt;  $ i           : num 1
-#&gt;  $ j           : num 2
-#&gt;  $ dots        :List of 1
-#&gt;   ..$ : num 3
-#&gt;  $ drop        : logi FALSE
-#&gt;  $ missing     :List of 3
-#&gt;   ..$ i   : logi FALSE
-#&gt;   ..$ j   : logi FALSE
-#&gt;   ..$ drop: logi TRUE
-#&gt;  $ n_args      : int 3
-#&gt;  $ n_subscripts: int 3</div><div class='input'>
-<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, , <span class='fl'>3</span>)</div><div class='output co'>#&gt; List of 7
-#&gt;  $ i           : num 1
-#&gt;  $ j           : num 2
-#&gt;  $ dots        :List of 2
+<span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>3</span>)</div><div class='output co'>#&gt; List of 3
+#&gt;  $ i   : num 1
+#&gt;  $ j   : num 2
+#&gt;  $ dots:List of 1
+#&gt;   ..$ : num 3</div><div class='input'><span class='fu'>slicer</span>(<span class='no'>x</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, , <span class='fl'>3</span>)</div><div class='output co'>#&gt; List of 3
+#&gt;  $ i   : num 1
+#&gt;  $ j   : num 2
+#&gt;  $ dots:List of 2
 #&gt;   ..$ : NULL
-#&gt;   ..$ : num 3
-#&gt;  $ drop        : logi FALSE
-#&gt;  $ missing     :List of 3
-#&gt;   ..$ i   : logi FALSE
-#&gt;   ..$ j   : logi FALSE
-#&gt;   ..$ drop: logi TRUE
-#&gt;  $ n_args      : int 4
-#&gt;  $ n_subscripts: int 4</div><div class='input'>
+#&gt;   ..$ : num 3</div><div class='input'>
 
-<span class='co'># You don't have to supply `...` and `drop` if you don't need it. This</span>
+<span class='co'># You don't have to supply `...` if you don't need it. This</span>
 <span class='co'># won't be as useful because it isn't as complex to count here, but it</span>
 <span class='co'># will still standardize `x[i]`, which is nice.</span>
 <span class='no'>slicer_simple</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>, <span class='no'>i</span>, <span class='no'>j</span>) {
   <span class='fu'>collect_subscripts</span>(<span class='no'>i</span>, <span class='no'>j</span>)
 }
 
-<span class='co'># Note that `drop` is returned as `NULL` here, since it isn't in your</span>
-<span class='co'># function signature.</span>
 <span class='fu'>slicer_simple</span>(<span class='no'>x</span>, <span class='fl'>1</span>)</div><div class='output co'>#&gt; $i
 #&gt; NULL
 #&gt; 
@@ -331,26 +276,6 @@ subscript should have the same meaning as <code><a href='https://rdrr.io/r/base/
 #&gt; 
 #&gt; $dots
 #&gt; list()
-#&gt; 
-#&gt; $drop
-#&gt; NULL
-#&gt; 
-#&gt; $missing
-#&gt; $missing$i
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $missing$j
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $missing$drop
-#&gt; [1] TRUE
-#&gt; 
-#&gt; 
-#&gt; $n_args
-#&gt; [1] 1
-#&gt; 
-#&gt; $n_subscripts
-#&gt; [1] 1
 #&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
