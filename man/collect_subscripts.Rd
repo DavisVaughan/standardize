@@ -45,7 +45,7 @@ that the \code{[} method is valid, and to count the number of arguments
 alongside \code{env}.}
 }
 \value{
-A named list of the following 3 elements containing information about the
+A named list of the following 4 elements containing information about the
 standardized subscripts.
 \itemize{
 \item \code{i}: The standardized \code{i} subscript. If \code{NULL}, \code{i} is considered to be
@@ -56,6 +56,8 @@ missing.
 supplied, an empty list is returned. If \code{...} are supplied and any
 subscripts are missing, \code{NULL} values are returned in those locations.
 For example, \code{x[i, j, , k]} would return a list of \code{list(NULL, k)}.
+\item \code{transformed}: A logical of size 1 indicating whether the transformation
+of \code{x[i]} to \code{x[,j]} was performed or not.
 }
 }
 \description{

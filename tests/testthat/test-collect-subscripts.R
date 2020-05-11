@@ -6,6 +6,7 @@ test_that("can do a no argument subset", {
 
   expect_identical(x$i, NULL)
   expect_identical(x$j, NULL)
+  expect_identical(x$transformed, FALSE)
 })
 
 test_that("extra args don't get in the way", {
@@ -23,6 +24,7 @@ test_that("can have missing `i` and `j`", {
 
   expect_identical(x$i, NULL)
   expect_identical(x$j, NULL)
+  expect_identical(x$transformed, FALSE)
 })
 
 # ------------------------------------------------------------------------------
@@ -33,6 +35,7 @@ test_that("`i` only slicing is transformed to `j`", {
 
   expect_identical(x$i, NULL)
   expect_identical(x$j, 1)
+  expect_identical(x$transformed, TRUE)
 })
 
 test_that("`i` only transformation can be turned off", {
@@ -40,12 +43,14 @@ test_that("`i` only transformation can be turned off", {
 
   expect_identical(x$i, 1)
   expect_identical(x$j, NULL)
+  expect_identical(x$transformed, FALSE)
 })
 
 test_that("extra args don't interfere with column transform", {
   x <- slicer_extras("a", 1, drop = TRUE)
 
   expect_identical(x$j, 1)
+  expect_identical(x$transformed, TRUE)
 })
 
 # ------------------------------------------------------------------------------
@@ -56,6 +61,7 @@ test_that("`i,` is interpreted as row subsetting", {
 
   expect_identical(x$i, 1)
   expect_identical(x$j, NULL)
+  expect_identical(x$transformed, FALSE)
 })
 
 test_that("extra args don't interfere", {
@@ -73,6 +79,7 @@ test_that("`,j` is column subsetting", {
 
   expect_identical(x$i, NULL)
   expect_identical(x$j, 1)
+  expect_identical(x$transformed, FALSE)
 })
 
 test_that("can select `j` by name", {
@@ -80,6 +87,7 @@ test_that("can select `j` by name", {
 
   expect_identical(x$i, NULL)
   expect_identical(x$j, 1)
+  expect_identical(x$transformed, FALSE)
 })
 
 # ------------------------------------------------------------------------------

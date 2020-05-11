@@ -58,7 +58,7 @@
 #'   alongside `env`.
 #'
 #' @return
-#' A named list of the following 3 elements containing information about the
+#' A named list of the following 4 elements containing information about the
 #' standardized subscripts.
 #'
 #' - `i`: The standardized `i` subscript. If `NULL`, `i` is considered to be
@@ -71,6 +71,9 @@
 #'   supplied, an empty list is returned. If `...` are supplied and any
 #'   subscripts are missing, `NULL` values are returned in those locations.
 #'   For example, `x[i, j, , k]` would return a list of `list(NULL, k)`.
+#'
+#' - `transformed`: A logical of size 1 indicating whether the transformation
+#'   of `x[i]` to `x[,j]` was performed or not.
 #'
 #' @export
 #' @examples
@@ -151,17 +154,21 @@ collect_subscripts <- function(i,
 
   if (column_transform) {
     n_subscripts <- count_subscripts(fml_names, env)
+    transformed <- n_subscripts == 1L && !i_missing
 
-    if (n_subscripts == 1L && !i_missing) {
+    if (transformed) {
       j <- i
       i <- NULL
     }
+  } else {
+    transformed <- FALSE
   }
 
   list(
     i = i,
     j = j,
-    dots = dots
+    dots = dots,
+    transformed = transformed
   )
 }
 

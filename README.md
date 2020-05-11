@@ -69,26 +69,29 @@ class(df) <- c("foo_df", class(df))
 
 # Column subsetting, standardized to `i = NULL, j = 1`
 df[1]
-#> List of 3
-#>  $ i   : NULL
-#>  $ j   : num 1
-#>  $ dots: list()
+#> List of 4
+#>  $ i          : NULL
+#>  $ j          : num 1
+#>  $ dots       : list()
+#>  $ transformed: logi TRUE
 #> NULL
 
 # Row subsetting with implicit `j = NULL`
 df[1,]
-#> List of 3
-#>  $ i   : num 1
-#>  $ j   : NULL
-#>  $ dots: list()
+#> List of 4
+#>  $ i          : num 1
+#>  $ j          : NULL
+#>  $ dots       : list()
+#>  $ transformed: logi FALSE
 #> NULL
 
 # Still considered column subsetting
 df[1, drop = FALSE]
-#> List of 3
-#>  $ i   : NULL
-#>  $ j   : num 1
-#>  $ dots: list()
+#> List of 4
+#>  $ i          : NULL
+#>  $ j          : num 1
+#>  $ dots       : list()
+#>  $ transformed: logi TRUE
 #> NULL
 ```
 
@@ -112,37 +115,41 @@ class(x) <- c("foo_array", class(x))
 
 # Not interpreted as `x[,j]`
 x[1]
-#> List of 3
-#>  $ i   : num 1
-#>  $ j   : NULL
-#>  $ dots: list()
+#> List of 4
+#>  $ i          : num 1
+#>  $ j          : NULL
+#>  $ dots       : list()
+#>  $ transformed: logi FALSE
 #> NULL
 
 # Compare the following results, see the implicit `NULL` in the 3rd dimension?
 x[1, 2]
-#> List of 3
-#>  $ i   : num 1
-#>  $ j   : num 2
-#>  $ dots: list()
+#> List of 4
+#>  $ i          : num 1
+#>  $ j          : num 2
+#>  $ dots       : list()
+#>  $ transformed: logi FALSE
 #> NULL
 x[1, 2,]
-#> List of 3
-#>  $ i   : num 1
-#>  $ j   : num 2
-#>  $ dots:List of 1
+#> List of 4
+#>  $ i          : num 1
+#>  $ j          : num 2
+#>  $ dots       :List of 1
 #>   ..$ : NULL
+#>  $ transformed: logi FALSE
 #> NULL
 
 # Things can get a little crazy in high dimensional space, but this should
 # be fairly interpretable.
 x[1, 2, , 3, , 5, drop = TRUE]
-#> List of 3
-#>  $ i   : num 1
-#>  $ j   : num 2
-#>  $ dots:List of 4
+#> List of 4
+#>  $ i          : num 1
+#>  $ j          : num 2
+#>  $ dots       :List of 4
 #>   ..$ : NULL
 #>   ..$ : num 3
 #>   ..$ : NULL
 #>   ..$ : num 5
+#>  $ transformed: logi FALSE
 #> NULL
 ```
