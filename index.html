@@ -102,26 +102,29 @@
 
 <span class="co"># Column subsetting, standardized to `i = NULL, j = 1`</span>
 <span class="no">df</span>[<span class="fl">1</span>]
-<span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ i   : NULL</span>
-<span class="co">#&gt;  $ j   : num 1</span>
-<span class="co">#&gt;  $ dots: list()</span>
+<span class="co">#&gt; List of 4</span>
+<span class="co">#&gt;  $ i          : NULL</span>
+<span class="co">#&gt;  $ j          : num 1</span>
+<span class="co">#&gt;  $ dots       : list()</span>
+<span class="co">#&gt;  $ transformed: logi TRUE</span>
 <span class="co">#&gt; NULL</span>
 
 <span class="co"># Row subsetting with implicit `j = NULL`</span>
 <span class="no">df</span>[<span class="fl">1</span>,]
-<span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ i   : num 1</span>
-<span class="co">#&gt;  $ j   : NULL</span>
-<span class="co">#&gt;  $ dots: list()</span>
+<span class="co">#&gt; List of 4</span>
+<span class="co">#&gt;  $ i          : num 1</span>
+<span class="co">#&gt;  $ j          : NULL</span>
+<span class="co">#&gt;  $ dots       : list()</span>
+<span class="co">#&gt;  $ transformed: logi FALSE</span>
 <span class="co">#&gt; NULL</span>
 
 <span class="co"># Still considered column subsetting</span>
 <span class="no">df</span>[<span class="fl">1</span>, <span class="kw">drop</span> <span class="kw">=</span> <span class="fl">FALSE</span>]
-<span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ i   : NULL</span>
-<span class="co">#&gt;  $ j   : num 1</span>
-<span class="co">#&gt;  $ dots: list()</span>
+<span class="co">#&gt; List of 4</span>
+<span class="co">#&gt;  $ i          : NULL</span>
+<span class="co">#&gt;  $ j          : num 1</span>
+<span class="co">#&gt;  $ dots       : list()</span>
+<span class="co">#&gt;  $ transformed: logi TRUE</span>
 <span class="co">#&gt; NULL</span></pre></div>
 <p>It also helps with more complex array subsetting. In this case, you also need to count higher dimensional subsetting in the <code>...</code>. Again, implicit dimensions should be returned as <code>NULL</code> to imply that they were counted but are missing. With array subsetting, you probably don’t want <code>x[i]</code> to be interpreted as <code>x[,j]</code>, so you can turn that off with <code>column_transform = FALSE</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="r"><span class="no">`[.foo_array`</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>, <span class="no">i</span>, <span class="no">j</span>, <span class="no">...</span>, <span class="no">drop</span> <span class="kw">=</span> <span class="fl">FALSE</span>) {
@@ -133,38 +136,42 @@
 
 <span class="co"># Not interpreted as `x[,j]`</span>
 <span class="no">x</span>[<span class="fl">1</span>]
-<span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ i   : num 1</span>
-<span class="co">#&gt;  $ j   : NULL</span>
-<span class="co">#&gt;  $ dots: list()</span>
+<span class="co">#&gt; List of 4</span>
+<span class="co">#&gt;  $ i          : num 1</span>
+<span class="co">#&gt;  $ j          : NULL</span>
+<span class="co">#&gt;  $ dots       : list()</span>
+<span class="co">#&gt;  $ transformed: logi FALSE</span>
 <span class="co">#&gt; NULL</span>
 
 <span class="co"># Compare the following results, see the implicit `NULL` in the 3rd dimension?</span>
 <span class="no">x</span>[<span class="fl">1</span>, <span class="fl">2</span>]
-<span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ i   : num 1</span>
-<span class="co">#&gt;  $ j   : num 2</span>
-<span class="co">#&gt;  $ dots: list()</span>
+<span class="co">#&gt; List of 4</span>
+<span class="co">#&gt;  $ i          : num 1</span>
+<span class="co">#&gt;  $ j          : num 2</span>
+<span class="co">#&gt;  $ dots       : list()</span>
+<span class="co">#&gt;  $ transformed: logi FALSE</span>
 <span class="co">#&gt; NULL</span>
 <span class="no">x</span>[<span class="fl">1</span>, <span class="fl">2</span>,]
-<span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ i   : num 1</span>
-<span class="co">#&gt;  $ j   : num 2</span>
-<span class="co">#&gt;  $ dots:List of 1</span>
+<span class="co">#&gt; List of 4</span>
+<span class="co">#&gt;  $ i          : num 1</span>
+<span class="co">#&gt;  $ j          : num 2</span>
+<span class="co">#&gt;  $ dots       :List of 1</span>
 <span class="co">#&gt;   ..$ : NULL</span>
+<span class="co">#&gt;  $ transformed: logi FALSE</span>
 <span class="co">#&gt; NULL</span>
 
 <span class="co"># Things can get a little crazy in high dimensional space, but this should</span>
 <span class="co"># be fairly interpretable.</span>
 <span class="no">x</span>[<span class="fl">1</span>, <span class="fl">2</span>, , <span class="fl">3</span>, , <span class="fl">5</span>, <span class="kw">drop</span> <span class="kw">=</span> <span class="fl">TRUE</span>]
-<span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ i   : num 1</span>
-<span class="co">#&gt;  $ j   : num 2</span>
-<span class="co">#&gt;  $ dots:List of 4</span>
+<span class="co">#&gt; List of 4</span>
+<span class="co">#&gt;  $ i          : num 1</span>
+<span class="co">#&gt;  $ j          : num 2</span>
+<span class="co">#&gt;  $ dots       :List of 4</span>
 <span class="co">#&gt;   ..$ : NULL</span>
 <span class="co">#&gt;   ..$ : num 3</span>
 <span class="co">#&gt;   ..$ : NULL</span>
 <span class="co">#&gt;   ..$ : num 5</span>
+<span class="co">#&gt;  $ transformed: logi FALSE</span>
 <span class="co">#&gt; NULL</span></pre></div>
 </div>
 </div>
