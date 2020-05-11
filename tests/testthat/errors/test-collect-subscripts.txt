@@ -1,4 +1,24 @@
 
+`i` must be in the signature
+============================
+
+> slicer <- (function(j, ...) {
++   collect_subscripts(j = j, ...)
++ })
+> slicer(1)
+Error: Caller function must have formal argument `i`.
+
+
+`j` must be in the signature
+============================
+
+> slicer <- (function(i, ...) {
++   collect_subscripts(i, ...)
++ })
+> slicer(1)
+Error: Caller function must have formal argument `j`.
+
+
 i and j must be adjacent in the signature
 =========================================
 

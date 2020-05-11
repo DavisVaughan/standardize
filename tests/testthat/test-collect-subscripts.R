@@ -231,6 +231,54 @@ test_that("can be doubly wrapped and manually passed env and fn", {
 # ------------------------------------------------------------------------------
 # Errors
 
+test_that("`env` must be an environment", {
+  expect_error(collect_subscripts(env = "x"), "must be an environment")
+})
+
+test_that("Can't call `collect_subscripts()` at the top level", {
+  # Hack to get it to evaluate at the top level since `expect_error()` enquos
+  expect_error(
+    eval(quote(collect_subscripts()), globalenv()),
+    "only be called from inside a function"
+  )
+})
+
+test_that("`fn` must be a function", {
+  slicer <- function(i, j, ...) {
+    collect_subscripts(i, j, ..., fn = "x")
+  }
+
+  expect_error(slicer(1), "must be a function")
+})
+
+test_that("`column_transform` must be a boolean", {
+  slicer <- function(i, j, ...) {
+    collect_subscripts(i, j, ..., column_transform = "x")
+  }
+
+  expect_error(slicer(1), "must be a boolean value")
+})
+
+test_that("`i` must be in the signature", {
+  verify_errors({
+    slicer <- function(j, ...) {
+      collect_subscripts(j = j, ...)
+    }
+
+    expect_error(slicer(1))
+  })
+})
+
+test_that("`j` must be in the signature", {
+  verify_errors({
+    slicer <- function(i, ...) {
+      collect_subscripts(i, ...)
+    }
+
+    expect_error(slicer(1))
+  })
+})
+
 test_that("i and j must be adjacent in the signature", {
   # Note: This check keeps `x[i,]` from counting incorrectly.
   # It assumes `j` is next.
@@ -247,6 +295,20 @@ test_that("i and j must be adjacent in the signature", {
 
 test_that("collect_subscripts() has informative errors", {
   verify_output(test_path("errors", "test-collect-subscripts.txt"), {
+    "# `i` must be in the signature"
+    slicer <- function(j, ...) {
+      collect_subscripts(j = j, ...)
+    }
+
+    slicer(1)
+
+    "# `j` must be in the signature"
+    slicer <- function(i, ...) {
+      collect_subscripts(i, ...)
+    }
+
+    slicer(1)
+
     "# i and j must be adjacent in the signature"
     slicer <- function(i, k, j, ...) {
       collect_subscripts(i, j, ...)
