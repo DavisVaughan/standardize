@@ -1,0 +1,13 @@
+
+i and j must be adjacent in the signature
+=========================================
+
+> slicer <- (function(i, k, j, ...) {
++   collect_subscripts(i, j, ...)
++ })
+> slicer(1)
+Error: Caller function must place arguments `i` and `j` adjacent to each other, in that order.
+
+> slicer(1, )
+Error: Caller function must place arguments `i` and `j` adjacent to each other, in that order.
+

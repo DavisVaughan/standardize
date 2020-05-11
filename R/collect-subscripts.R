@@ -137,11 +137,22 @@ collect_subscripts <- function(i,
   fmls <- formals(fn)
   fml_names <- names(fmls)
 
-  if (!has_name("i", fml_names)) {
+  loc_subscripts <- match(c("i", "j", "..."), fml_names)
+  loc_i <- loc_subscripts[[1]]
+  loc_j <- loc_subscripts[[2]]
+  loc_dots <- loc_subscripts[[3]]
+
+  if (is.na(loc_i)) {
     abort("Caller function must have formal argument `i`.")
   }
-  if (!has_name("j", fml_names)) {
+  if (is.na(loc_j)) {
     abort("Caller function must have formal argument `j`.")
+  }
+  if (loc_j - loc_i != 1L) {
+    abort("Caller function must place arguments `i` and `j` adjacent to each other, in that order.")
+  }
+  if (is.na(loc_dots)) {
+    loc_subscripts <- loc_subscripts[1:2]
   }
 
   i_missing <- missing(i)
@@ -153,8 +164,11 @@ collect_subscripts <- function(i,
   dots <- dots_standardize(environment())
 
   if (column_transform) {
-    n_subscripts <- count_subscripts(fml_names, env)
-    transformed <- n_subscripts == 1L && !i_missing
+    loc_extras <- index_invert(loc_subscripts)
+    fml_extra_names <- fml_names[loc_extras]
+
+    n_subscripts_used <- count_subscripts(fml_extra_names, env)
+    transformed <- n_subscripts_used == 1L && !i_missing
 
     if (transformed) {
       j <- i
@@ -183,24 +197,22 @@ abort <- function(msg) {
 # they are only considered missing in the environment in which they are first
 # created. If you pass on a missing argument that has a default, it is no longer
 # considered missing.
-count_subscripts <- function(fml_names, env) {
+count_subscripts <- function(fml_extra_names, env) {
   expr <- quote(nargs())
-  n_args <- eval_bare(expr, env)
+  n_args_used <- eval_bare(expr, env)
 
-  fml_extra_names <- setdiff(fml_names, c("i", "j", "..."))
-
-  n_extras <- 0L
+  n_extras_used <- 0L
 
   # Count non-missing extras
   for (name in fml_extra_names) {
     expr <- bquote(missing(.(name)))
     missing <- eval_bare(expr, env)
-    n_extras <- n_extras + as.integer(!missing)
+    n_extras_used <- n_extras_used + as.integer(!missing)
   }
 
-  n_subscripts <- n_args - n_extras
+  n_subscripts_used <- n_args_used - n_extras_used
 
-  n_subscripts
+  n_subscripts_used
 }
 
 subscript_standardize <- function(x, missing) {
@@ -217,10 +229,18 @@ dots_standardize <- function(env) {
   .Call(export_dots_standardize, env)
 }
 
-has_name <- function(name, names) {
-  name %in% names
-}
-
 is_bool <- function(x) {
   is.logical(x) && length(x) == 1L && !is.na(x)
+}
+
+index_invert <- function(x) {
+  if (index_is_empty(x)) {
+    TRUE
+  } else {
+    -x
+  }
+}
+
+index_is_empty <- function(x) {
+  !length(x) || all(x == 0L)
 }

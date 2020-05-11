@@ -227,3 +227,33 @@ test_that("can be doubly wrapped and manually passed env and fn", {
   expect_identical(x$j, NULL)
   expect_identical(x$dots, list())
 })
+
+# ------------------------------------------------------------------------------
+# Errors
+
+test_that("i and j must be adjacent in the signature", {
+  # Note: This check keeps `x[i,]` from counting incorrectly.
+  # It assumes `j` is next.
+  verify_errors({
+    slicer <- function(i, k, j, ...) {
+      collect_subscripts(i, j, ...)
+    }
+
+    expect_error(slicer(1))
+    expect_error(slicer(1,))
+  })
+})
+
+
+test_that("collect_subscripts() has informative errors", {
+  verify_output(test_path("errors", "test-collect-subscripts.txt"), {
+    "# i and j must be adjacent in the signature"
+    slicer <- function(i, k, j, ...) {
+      collect_subscripts(i, j, ...)
+    }
+
+    slicer(1)
+    slicer(1,)
+  })
+})
+
