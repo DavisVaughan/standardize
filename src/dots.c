@@ -128,6 +128,7 @@ static inline SEXP dot_eval(SEXP dot, SEXP env) {
 static inline SEXP dot_prom_eval(SEXP dot, SEXP env) {
   SEXP code = PRCODE(dot);
 
+  // Used on R <= 3.4.4 with implicit dots like `x[i,j,,k]`
   if (code == R_MissingArg) {
     return R_NilValue;
   }
