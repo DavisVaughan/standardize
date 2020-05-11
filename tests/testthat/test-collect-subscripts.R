@@ -186,6 +186,19 @@ test_that("dots are optional", {
 })
 
 # ------------------------------------------------------------------------------
+# named dots
+
+test_that("names are kept on dots", {
+  x <- slicer(1, 2, a = 3, 4, b = 5)
+  expect_named(x$dots, c("a", "", "b"))
+})
+
+test_that("names are backfilled with empty strings", {
+  x <- slicer(1, 2, 3, a = 4)
+  expect_named(x$dots, c("", "a"))
+})
+
+# ------------------------------------------------------------------------------
 # Misc
 
 test_that("can handle any number of extra args in the caller", {
